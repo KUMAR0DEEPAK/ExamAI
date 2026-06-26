@@ -1,6 +1,6 @@
 import { getToken } from "../utils/token.js";
 import UserModel from "../models/user.model.js";
-import jwt from "jsonwebtoken";
+  
 export const googleAuth = async (req, res) => {
   try {
     const { name, email } = req.body;
