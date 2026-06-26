@@ -118,7 +118,42 @@ npm run dev
 ---
 
 ## 📄 Key Features
-- **AI Notes Generator:** Input a topic or syllabus guidelines, and receive clean markdown notes along with generated diagrams automatically formatted using Mermaid.js.
-- **PDF Export:** Download generated study guides and notes immediately as PDF files.
-- **Responsive Layout:** Dark/light mode theme toggle, sleek sidebar navigation, and a modern responsive dashboard built with Framer Motion.
-- **Billing & Subscriptions:** Purchase credits or switch to a subscription tier seamlessly via Razorpay integration.
+
+### 🤖 AI-Powered Notes Engine (Google Gemini AI)
+- **Tailored Note Customization:** Users can enter a specific **Topic Name**, **Class / Study Level** (e.g., *Class 10*), and **Exam Target** (e.g., *CBSE*, *JEE*, *NEET*) to receive highly targeted, exam-ready revision notes.
+- **Smart Content Processing:** The system generates structured, syllabus-oriented explanations corresponding to the user's specific exam board and level.
+- **Credit Cost Mechanism:** Each AI generation consumes **10 credits** from the user's balance.
+
+### 📊 Interactive Visualizations & Charts
+- **AI-Generated Concept Maps (Mermaid.js):** Generates interactive flowcharts and concept diagrams on-the-fly to visualize complex workflows, loops, cycle routes, or hierarchies.
+- **Data-driven Charts (Recharts):** Automatically parses tabular and numerical data from the topic to render beautiful, responsive graphs (bar charts, line charts, etc.) inside the application for better analytical understanding.
+
+### 📝 Exam Study Aids & Practice
+- **Starred Priority Subtopics:** Automatically structures key syllabus concepts into importance levels (e.g., High, Medium, Low priority) to help students organize study order.
+- **Interactive FAQ / Q&A Accordion:**
+  - Generates short-answer, long-answer, and diagram-based questions.
+  - Interactive **"Show/Hide Answer"** accordion UI allowing students to test themselves without seeing the answer upfront.
+- **Exam Quick Revision Mode:** Offers a toggle-able "Quick Revision" tab containing short, high-yield bulleted key points specifically selected for last-minute cramming.
+
+### 📂 Export & Offline Study
+- **Dynamic PDF Generation (PDFKit):** Users can export the fully generated markdown notes, priority subtopics, revision points, and questions (including answers) into a clean, print-friendly PDF file locally using a single click.
+
+### 📚 History & Sidebar Navigation
+- **Persistent Sidebar:** Displays an outline of the generated document segments (Subtopics, Notes, Diagrams, Charts, and Questions) for quick page scrolling.
+- **Past Notes Archive (History page):** 
+  - Keeps a history of all user-generated notes in a remote MongoDB database.
+  - Responsive mobile-friendly hamburger menu sidebar loaded with historical study notes.
+  - Quick-switch buttons to reload previous results without spending new credits.
+
+### 💳 User Management & Payment Integrations (Razorpay)
+- **Secure Session Authentication:** JSON Web Token (JWT) combined with Secure Cookies (`cookie-parser`) and Firebase integrations to register, login, and verify users securely.
+- **Razorpay Payment Integration:** Includes a checkout package allowing students to select from 3 packages to replenish credits:
+  - **Starter Plan:** ₹99 for 150 credits
+  - **Popular Plan:** ₹200 for 450 credits
+  - **Pro Learner Plan:** ₹500 for 1500 credits
+- **Payment Verification Flow:** Employs SHA-256 HMAC digital signature verification (`razorpay_signature`) in the backend to securely credit the user's balance upon successful payment.
+
+### ✨ Modern Premium UI/UX Design
+- **Adaptive Dark Mode & Theme Toggle:** Seamlessly switch between light and dark themes.
+- **Framer Motion Animations:** Smooth page loaders, spring-based sliding sidebars, 3D card tilt gestures on hover, and smooth layout changes.
+
