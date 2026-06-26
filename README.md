@@ -1,6 +1,9 @@
 # ExamAI 🚀
 
+🔗 **Live Link:** [https://examai-g2el.onrender.com](https://examai-g2el.onrender.com)
+
 ExamAI is a modern, AI-powered exam and study assistant. It helps students generate comprehensive study notes, view interactive concept maps using Mermaid.js diagrams, visualize performance data, export study materials to PDF format, and purchase study credits or subscriptions.
+
 
 ---
 
