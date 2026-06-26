@@ -17,7 +17,7 @@ const app = express();
 app.use(
   cors({
 
-    origin: process.env.CLIENT_URL,
+    origin:"https://examai-g2el.onrender.com" || process.env.CLIENT_URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   })
