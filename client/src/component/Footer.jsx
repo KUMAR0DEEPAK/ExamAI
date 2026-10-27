@@ -3,142 +3,171 @@ import { motion } from "motion/react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../utils/config.js";
+import { toast } from "sonner";
+import logo from "../assets/logo.jpg";
+import { FaGithub, FaTwitter, FaLinkedin, FaYoutube, FaPaperPlane } from "react-icons/fa";
+
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState("");
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+
   const handleSubscribe = async (e) => {
     e.preventDefault();
 
     if (!email || !email.includes("@")) {
-      setMsg("Enter valid email ❌");
+      toast.error("Please enter a valid email address.");
       return;
     }
 
     try {
       setLoading(true);
-      setMsg("");
-
-      const res = await axios.post(`${serverUrl}/api/subscribe`, {
-        email
-      },{withCredentials: true});
+      const res = await axios.post(
+        `${serverUrl}/api/subscribe`,
+        { email },
+        { withCredentials: true }
+      );
 
       if (res.data.success) {
-        setMsg("Subscribed successfully ✅");
+        toast.success("Subscribed to ExamAI newsletter! 🎉");
         setEmail("");
       } else {
-        setMsg("Failed ❌");
+        toast.error("Subscription failed. Please try again.");
       }
     } catch (error) {
-      console.error(error);
-      setMsg("Server error ❌");
+      console.error("Subscription Error:", error);
+      toast.error("Server error. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
-  return (
-    <motion.footer
-      className=" bg-black/90 text-white mx-4 sm:mx-6 pt-10 sm:pt-12 pb-6 px-4 sm:px-6 rounded-t-2xl"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="max-w-6xl mx-auto">
-        {/* Top Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
-          {/* Logo */}
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold">
-              ExamAI
-            </h2>
-            <p className="text-gray-400 mt-3 text-sm">
-              Generate exam-ready notes instantly with AI.
-            </p>
 
-            {/* Social Icons */}
-            <div className="flex gap-3 mt-5">
-              <span className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-blue-600 cursor-pointer text-sm">
-                f
+  return (
+    <footer className="mt-auto border-t border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl text-gray-700 dark:text-gray-300 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          
+          {/* Brand info */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2.5">
+              <img src={logo} alt="ExamAI Logo" className="w-8 h-8 rounded-lg object-cover ring-1 ring-indigo-500/20" />
+              <span className="text-xl font-extrabold font-heading tracking-tight bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-300 bg-clip-text text-transparent">
+                ExamAI
               </span>
-              <span className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-sky-500 cursor-pointer text-sm">
-                t
-              </span>
-              <span className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-blue-700 cursor-pointer text-sm">
-                in
-              </span>
-              <span className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-red-600 cursor-pointer text-sm">
-                yt
-              </span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+              AI-powered study partner transforming syllabus topics into high-yield notes, interactive Mermaid flowcharts, and model exam questions.
+            </p>
+            <div className="flex gap-2.5 pt-1">
+              <a 
+                href="https://github.com" 
+                target="_blank" 
+                rel="noreferrer"
+                className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-center text-xs transition-colors"
+              >
+                <FaGithub />
+              </a>
+              <a 
+                href="https://twitter.com" 
+                target="_blank" 
+                rel="noreferrer"
+                className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-sky-500 flex items-center justify-center text-xs transition-colors"
+              >
+                <FaTwitter />
+              </a>
+              <a 
+                href="https://linkedin.com" 
+                target="_blank" 
+                rel="noreferrer"
+                className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-blue-600 flex items-center justify-center text-xs transition-colors"
+              >
+                <FaLinkedin />
+              </a>
+              <a 
+                href="https://youtube.com" 
+                target="_blank" 
+                rel="noreferrer"
+                className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-red-600 flex items-center justify-center text-xs transition-colors"
+              >
+                <FaYoutube />
+              </a>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3">
-              Quick Links
-            </h3>
-            <ul className="space-y-2 text-gray-400 text-sm">
-              <li onClick={()=> navigate("/")} className="hover:text-white cursor-pointer">Home</li>
-              <li className="hover:text-white cursor-pointer">About</li>
-              <li className="hover:text-white cursor-pointer">Contact</li>
-              <li className="hover:text-white cursor-pointer" onClick={()=> navigate("/history")}>History</li>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white mb-3 font-heading">
+              Study Tools
+            </h4>
+            <ul className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+              <li onClick={() => navigate("/notes")} className="hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors">
+                AI Notes Generator
+              </li>
+              <li onClick={() => navigate("/history")} className="hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors">
+                Saved Notes Archive
+              </li>
+              <li onClick={() => navigate("/pricing")} className="hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors">
+                Study Credit Packages
+              </li>
+              <li onClick={() => navigate("/")} className="hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors">
+                Interactive Concept Maps
+              </li>
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Supported Boards */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3">
-              Resources
-            </h3>
-            <ul className="space-y-2 text-gray-400 text-sm">
-              <li className="hover:text-white cursor-pointer">Blog</li>
-              <li className="hover:text-white cursor-pointer">FAQs</li>
-              <li className="hover:text-white cursor-pointer">Study Tips</li>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white mb-3 font-heading">
+              Exam Coverage
+            </h4>
+            <ul className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+              <li>CBSE / ICSE Board Exams</li>
+              <li>JEE Main & Advanced Revision</li>
+              <li>NEET Medical Exam Prep</li>
+              <li>College & University Syllabi</li>
             </ul>
           </div>
 
-          {/* Subscribe */}
+          {/* Newsletter Form */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3">
-              Subscribe
-            </h3>
-
-            <form
-              onSubmit={handleSubscribe}
-              className="flex flex-col sm:flex-row lg:flex-col gap-3"
-            >
-              <input
-                type="email"
-                placeholder="Enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="px-3 py-2 rounded-lg bg-white/10 text-white border border-white/20 outline-none w-full"
-              />
-
+            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white mb-3 font-heading">
+              Exam Tips & Updates
+            </h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              Get weekly high-yield study hacks, formulas, and updates.
+            </p>
+            <form onSubmit={handleSubscribe} className="space-y-2">
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="Enter student email..."
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
               <button
                 type="submit"
                 disabled={loading}
-                className={`py-2 px-4 rounded-lg font-medium whitespace-nowrap ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
+                className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50"
               >
-                {loading ? "..." : "Subscribe"}
+                <FaPaperPlane className="text-[10px]" />
+                <span>{loading ? "Subscribing..." : "Subscribe for Free"}</span>
               </button>
             </form>
-
-            {msg && <p className="text-sm mt-2 text-gray-400">{msg}</p>}
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="border-t border-gray-700 mt-8 sm:mt-10 pt-4 sm:pt-5 text-center text-xs sm:text-sm text-gray-500">
-          © {new Date().getFullYear()} ExamAI. All rights reserved.
+        {/* Bottom Bar */}
+        <div className="mt-10 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
+          <p>ExamAI &copy; {new Date().getFullYear()} · Built for students worldwide.</p>
+          <div className="flex gap-4">
+            <span className="hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">Privacy Policy</span>
+            <span className="hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">Terms of Service</span>
+          </div>
         </div>
       </div>
-    </motion.footer>
+    </footer>
   );
 };
 

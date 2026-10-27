@@ -105,6 +105,14 @@ CHART OBJECT FORMAT:
   ]
 }
 
+QUIZ & PRACTICE RULES:
+- Generate an array of 5 Multiple Choice Questions in "quiz".
+- Each question must have:
+  - "question": clear exam-style question string
+  - "options": exactly 4 distinct answer choices (strings)
+  - "correctAnswer": integer (0, 1, 2, or 3) indicating the zero-indexed correct option
+  - "explanation": 1-2 sentence explanation of why this answer is correct
+
 STRICT JSON FORMAT (DO NOT CHANGE):
 
 {
@@ -132,7 +140,15 @@ STRICT JSON FORMAT (DO NOT CHANGE):
     "type": "flowchart | graph | process",
     "data": ""
   },
-  "charts": []
+  "charts": [],
+  "quiz": [
+    {
+      "question": "string",
+      "options": ["string", "string", "string", "string"],
+      "correctAnswer": 0,
+      "explanation": "string"
+    }
+  ]
 }
 
 RETURN ONLY VALID JSON.

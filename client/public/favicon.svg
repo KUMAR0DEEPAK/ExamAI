@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.9" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#4f46e5" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background squircle -->
+  <rect width="64" height="64" rx="16" fill="#090d16" stroke="url(#grad1)" stroke-width="1.5" />
+
+  <!-- Graduation Cap (Top) -->
+  <path d="M32 10 L52 18 L32 26 L12 18 Z" fill="url(#grad1)" filter="url(#shadow)" />
+  <path d="M46 20.5 L46 28 C46 29 45 30 44 30 C43 30 42 29 42 28 L42 22 Z" fill="#38bdf8" />
+  <circle cx="44" cy="31" r="2" fill="#38bdf8" />
+
+  <!-- Open Book & AI Nodes (Bottom) -->
+  <path d="M32 28 Q39 26 50 28 L50 48 Q39 46 32 49 Q25 46 14 48 L14 28 Q25 26 32 28 Z" fill="none" stroke="url(#glow)" stroke-width="2.5" stroke-linejoin="round" />
+  <path d="M32 28 L32 49" stroke="url(#grad1)" stroke-width="2" />
+
+  <!-- AI Sparks / Nodes -->
+  <circle cx="23" cy="37" r="1.8" fill="#38bdf8" />
+  <circle cx="41" cy="37" r="1.8" fill="#c084fc" />
+  <circle cx="32" cy="38" r="2.2" fill="#ffffff" filter="url(#shadow)" />
+  <line x1="23" y1="37" x2="32" y2="38" stroke="#818cf8" stroke-width="1" stroke-dasharray="2,1" />
+  <line x1="41" y1="37" x2="32" y2="38" stroke="#818cf8" stroke-width="1" stroke-dasharray="2,1" />
+</svg>

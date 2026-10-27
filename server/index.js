@@ -9,21 +9,22 @@ import notesRouter from './routes/generate.route.js';
 import pdfRouter from './routes/pdf.route.js'
 import creditRouter from './routes/payment.route.js';
 import subscribeRoutes from "./routes/subscription.route.js";
+import compression from 'compression';
 dotenv.config();
-
 
 const app = express();
 
+app.use(compression());
+
 app.use(
   cors({
-
-    origin:"https://examai-g2el.onrender.com" || process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL || "https://examai-g2el.onrender.com",
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
 const port = process.env.PORT || 8000;

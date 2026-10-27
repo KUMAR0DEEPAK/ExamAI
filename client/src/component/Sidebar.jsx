@@ -1,84 +1,100 @@
 import React from "react";
+import { FaBookmark, FaStar, FaBookOpen, FaProjectDiagram, FaChartPie, FaQuestionCircle } from "react-icons/fa";
 
 function Sidebar({ result }) {
   if (
     !result ||
-    !result.questions.long ||
-    !result.questions.short ||
+    !result.questions?.long ||
+    !result.questions?.short ||
     !result.subTopics
   ) {
     return null;
   }
-  return (
-    <div className=" bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-4 space-y-6 text-black dark:text-white transition-colors duration-300">
-      <div className="flex items-center gap-2">
-        <span className="text-xl">📌</span>
-        <span className="font-bold text-lg text-indigo-600">
-          Quick Exam View
-        </span>
-      </div>
-      <section>
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-          ⭐ Sub topics (Priority Wise)
-        </p>
-        {Object.entries(result.subTopics).map(([star, topics]) => (
-          <div
-            key={star}
-            className="mb-3 rounded-lg bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-3"
-          >
-            <p className="text-sm font-bold text-yellow-600 dark:text-yellow-500 mb-1">
-              {star} Priority
-            </p>
-            <ul className="list-disc ml-4 text-sm text-gray-700 dark:text-gray-300 space-y-1">
-              {topics.map((topic, i) => (
-                <li key={i}> {topic}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
-      <section className="rounded-lg bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/30 p-3">
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-          🔥 Exam Importance
-        </p>
-        <span className="text-yellow-700 dark:text-yellow-400 font-bold text-sm">
-          {result.importance}
-        </span>
 
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-          ❓ Important Questions
+  const scrollTo = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const navItems = [
+    { id: "subtopics", label: "Priority Subtopics", icon: <FaStar className="text-amber-500" /> },
+    { id: "notes", label: "Detailed Notes", icon: <FaBookOpen className="text-indigo-500" /> },
+    ...(result.diagram?.data ? [{ id: "diagram", label: "Concept Diagram", icon: <FaProjectDiagram className="text-purple-500" /> }] : []),
+    ...(result.charts?.length > 0 ? [{ id: "charts", label: "Visual Charts", icon: <FaChartPie className="text-emerald-500" /> }] : []),
+    { id: "questions", label: "Practice Questions", icon: <FaQuestionCircle className="text-rose-500" /> },
+  ];
+
+  const totalQuestions = (result.questions?.short?.length || 0) + (result.questions?.long?.length || 0) + (result.questions?.diagram ? 1 : 0);
+
+  return (
+    <div className="sticky top-24 rounded-3xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-gray-200/80 dark:border-gray-800 p-5 shadow-lg shadow-black/5 dark:shadow-black/20 space-y-6 transition-colors">
+      
+      {/* Title */}
+      <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-2">
+          <span className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 text-xs">
+            <FaBookmark />
+          </span>
+          <span className="font-bold text-sm text-gray-900 dark:text-white">
+            Table of Contents
+          </span>
+        </div>
+        {result.importance && (
+          <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+            {result.importance}
+          </span>
+        )}
+      </div>
+
+      {/* Quick Jump Links */}
+      <div className="space-y-1">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-2">
+          Jump to Section
         </p>
-        <div className="mb-4 rounded-lg  bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-900/30 p-3">
-          <p className="text-sm font-medium text-indigo-700 dark:text-indigo-400 mb-2">
-            Short Questions
-          </p>
-          <ul className="list-disc ml-4 text-sm text-gray-700 dark:text-gray-300 space-y-1">
-            {result.questions.short.map((t, i) => (
-              <li key={i}>{typeof t === "string" ? t : t?.question}</li>
-            ))}
-          </ul>
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => scrollTo(item.id)}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-left cursor-pointer"
+          >
+            <span className="text-xs shrink-0">{item.icon}</span>
+            <span className="truncate">{item.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Topic Weightage Overview */}
+      <div className="pt-2">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-2 mb-2.5">
+          Topic Breakdown
+        </p>
+        <div className="space-y-2">
+          {Object.entries(result.subTopics).map(([star, topics]) => (
+            <div
+              key={star}
+              className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-xs"
+            >
+              <span className="font-semibold text-gray-700 dark:text-gray-300">
+                {star} Priority
+              </span>
+              <span className="font-bold text-gray-900 dark:text-white">
+                {topics.length} topics
+              </span>
+            </div>
+          ))}
+
+          <div className="p-2.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between text-xs">
+            <span className="font-semibold text-indigo-700 dark:text-indigo-300">
+              Exam Practice Q&A
+            </span>
+            <span className="font-bold text-indigo-600 dark:text-indigo-400">
+              {totalQuestions} questions
+            </span>
+          </div>
         </div>
-        <div className="mb-4 rounded-lg  bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/30 p-3">
-          <p className="text-sm font-medium text-purple-700 dark:text-purple-400 mb-2">
-            Long Questions
-          </p>
-          <ul className="list-disc ml-4 text-sm text-gray-700 dark:text-gray-300 space-y-1">
-            {result.questions.long.map((t, i) => (
-              <li key={i}>{typeof t === "string" ? t : t?.question}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="mb-4 rounded-lg  bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30 p-3">
-          <p className="text-sm font-medium text-blue-700 dark:text-blue-400 mb-2">Diagram</p>
-          <ul className="list-disc ml-4 text-sm text-gray-700 dark:text-gray-300 space-y-1">
-            <li>
-              {typeof result.questions.diagram === "string"
-                ? result.questions.diagram
-                : result.questions.diagram?.question}
-            </li>
-          </ul>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

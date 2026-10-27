@@ -1,1 +1,1 @@
-export const serverUrl = "https://examai-backend-2d2q.onrender.com";
+export const serverUrl = "http://localhost:8000";

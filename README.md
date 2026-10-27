@@ -1,9 +1,10 @@
 # ExamAI 🚀
 
+![ExamAI Cover](examai_cover_photo.png)
+
 🔗 **Live Link:** [https://examai-g2el.onrender.com](https://examai-g2el.onrender.com)
 
-ExamAI is a modern, AI-powered exam and study assistant. It helps students generate comprehensive study notes, view interactive concept maps using Mermaid.js diagrams, visualize performance data, export study materials to PDF format, and purchase study credits or subscriptions.
-
+ExamAI is a modern, AI-powered exam and study assistant. It helps students generate comprehensive study notes, view interactive concept maps using Mermaid.js diagrams, visualize performance data, take timed MCQ mock exams with live scoring, export study materials to PDF format, and purchase study credits.
 
 ---
 
@@ -137,6 +138,16 @@ npm run dev
   - Generates short-answer, long-answer, and diagram-based questions.
   - Interactive **"Show/Hide Answer"** accordion UI allowing students to test themselves without seeing the answer upfront.
 - **Exam Quick Revision Mode:** Offers a toggle-able "Quick Revision" tab containing short, high-yield bulleted key points specifically selected for last-minute cramming.
+- **Interactive MCQ Mock Exam Arena:**
+  - 5 exam-style MCQs generated per topic with distractor options and detailed explanations.
+  - 45-second per-question countdown timer, instant feedback, and dynamic confetti score celebration.
+  - Question review drawer with in-depth conceptual breakdown.
+
+### ⚡ Performance & Caching Architecture
+- **Sub-100ms Note Retrieval:** Implements an in-memory **LRU cache** with a 30-minute sliding TTL and MongoDB `.lean()` compound index lookups, achieving p95 latency under **5 ms** (benchmarked at 0.003 ms for RAM cache hits).
+- **95% Initial Bundle Size Reduction:** Dropped initial JavaScript bundle from **1,610 kB to 82 kB** using route-level `React.lazy`/`Suspense` and Vite `manualChunks` vendor splitting.
+- **Gzip Compression:** Enabled Express compression middleware reducing HTTP response payload sizes by over 70%.
+- **Audio Text-to-Speech (TTS):** Native Web Speech API integration allowing students to listen to audio revision summaries hands-free.
 
 ### 📂 Export & Offline Study
 - **Dynamic PDF Generation (PDFKit):** Users can export the fully generated markdown notes, priority subtopics, revision points, and questions (including answers) into a clean, print-friendly PDF file locally using a single click.

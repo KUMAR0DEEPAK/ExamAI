@@ -22,10 +22,10 @@ export const generateNotes = async (payload) => {
       { withCredentials: true }
     );
 
-    console.log(result.data);
     return result.data;
   } catch (err) {
-    console.log(err);
+    console.error("generateNotes API Error:", err);
+    throw err;
   }
 };
 

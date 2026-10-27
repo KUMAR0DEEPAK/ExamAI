@@ -1,52 +1,88 @@
 import React, { useEffect, useState } from "react";
-import { motion, scale } from "motion/react";
+import { motion } from "motion/react";
 import { generateNotes } from "../services/api";
 import { useDispatch } from "react-redux";
 import { updateCredits } from "../redux/userSlice.js";
-function TopicName({ setResult, setLoading, loading, setError }) {
+import { toast } from "sonner";
+import { 
+  FaLightbulb, 
+  FaGraduationCap, 
+  FaAward, 
+  FaBolt, 
+  FaProjectDiagram, 
+  FaChartPie, 
+  FaMagic, 
+  FaGem 
+} from "react-icons/fa";
+
+const EXAMPLE_TOPICS = [
+  { topic: "Photosynthesis", classLevel: "Class 10", examType: "CBSE" },
+  { topic: "React Hooks & State", classLevel: "Undergraduate", examType: "Computer Science" },
+  { topic: "Thermodynamics & Heat", classLevel: "Class 11", examType: "JEE" },
+  { topic: "DNA Replication", classLevel: "Class 12", examType: "NEET" },
+];
+
+function TopicName({ setResult, setNoteId, setLoading, loading, setError }) {
   const [topic, setTopic] = useState("");
   const [classLevel, setClassLevel] = useState("");
   const [examType, setExamType] = useState("");
   const [revisionMode, setRevisionMode] = useState(false);
-  const [includeDiagram, setIncludeDiagram] = useState(false);
-  const [includeChart, setIncudeChart] = useState(false);
+  const [includeDiagram, setIncludeDiagram] = useState(true);
+  const [includeChart, setIncludeChart] = useState(true);
   const [progress, setProgress] = useState(0);
   const [progressText, setProgressText] = useState("");
   const dispatch = useDispatch();
-  const handleSubmit = async () => {
+
+  const handleSelectExample = (item) => {
+    setTopic(item.topic);
+    setClassLevel(item.classLevel);
+    setExamType(item.examType);
+    toast.info(`Selected: "${item.topic}"`);
+  };
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
     if (!topic.trim()) {
-      setError("Please Enter the topic");
+      setError("Please enter a study topic");
+      toast.error("Please enter a study topic first");
       return;
     }
     setError("");
     setLoading(true);
     setResult(null);
+    if (setNoteId) setNoteId(null);
 
     try {
       const result = await generateNotes({
-        topic,
-        classLevel,
-        examType,
+        topic: topic.trim(),
+        classLevel: classLevel.trim(),
+        examType: examType.trim(),
         revisionMode,
         includeDiagram,
         includeChart,
       });
+
       setResult(result.data);
+      if (setNoteId && result.noteId) {
+        setNoteId(result.noteId);
+      }
       setLoading(false);
-      setTopic("");
-      setClassLevel("");
-      setExamType("");
-      setRevisionMode(false);
-      setIncludeDiagram(false);
-      setIncudeChart(false);
+      if (result.message) {
+        toast.info(result.message);
+      } else if (result.isCached) {
+        toast.success(`Notes retrieved in ${result.retrievalTimeMs || 12}ms! ⚡`);
+      } else {
+        toast.success("Notes generated successfully with Gemini AI! 🎉");
+      }
 
       if (typeof result.creditLeft === "number") {
         dispatch(updateCredits(result.creditLeft));
       }
-      //  console.log(result.creditLeft)
     } catch (err) {
-      console.log(err);
-      setError("Failed to fetch notes from the server");
+      console.error("Generate Notes Error:", err);
+      const errMsg = err?.response?.data?.message || "Failed to generate notes. Please check credits and try again.";
+      setError(errMsg);
+      toast.error(errMsg);
       setLoading(false);
     }
   };
@@ -58,22 +94,25 @@ function TopicName({ setResult, setLoading, loading, setError }) {
       return;
     }
 
-    let value = 0;
+    const steps = [
+      { at: 15, text: "Analyzing topic & exam syllabus..." },
+      { at: 45, text: "Synthesizing high-yield study notes..." },
+      { at: 75, text: "Generating interactive Mermaid diagrams & charts..." },
+      { at: 92, text: "Formulating exam practice questions & answers..." },
+      { at: 98, text: "Finalizing notes..." },
+    ];
+
+    let current = 0;
     const interval = setInterval(() => {
-      value += Math.random() * 8;
-      if (value >= 95) {
-        value = 95;
-        setProgressText("Almost Done...");
+      current += 3;
+      if (current >= 95) {
+        current = 95;
         clearInterval(interval);
-      } else if (value > 70) {
-        setProgressText("Finalizing notes...");
-      } else if (value > 40) {
-        setProgressText("Processing content...");
-      } else {
-        setProgressText("Generating notes...");
       }
-      setProgress(Math.floor(value));
-    }, 700);
+      const activeStep = steps.find((s) => s.at >= current) || steps[steps.length - 1];
+      setProgress(current);
+      setProgressText(activeStep.text);
+    }, 180);
 
     return () => clearInterval(interval);
   }, [loading]);
@@ -82,116 +121,247 @@ function TopicName({ setResult, setLoading, loading, setError }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-10 mx-6 max-sm:mx-1 rounded-2xl bg-linear-to-br bg-black/80 backdrop-blur-xl border border-white/10 p-8 grid grid-cols-1 gap-7"
-      style={{ transformStyle: "preserve-3d" }}
+      transition={{ duration: 0.5 }}
+      className="mt-6 max-w-5xl mx-auto rounded-3xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-200/80 dark:border-gray-800 p-6 sm:p-10 shadow-xl shadow-black/5 dark:shadow-black/40"
     >
-      <input
-        type="text"
-        className="w-full p-3 rounded-xl bg-white/10 backdrop-blur-lg border placeholder-gray-400  border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-        placeholder="Enter Topic(e.g. Web Development)"
-        onChange={(e) => setTopic(e.target.value)}
-        value={topic}
-      />
-      <input
-        type="text"
-        className="w-full p-3 rounded-xl bg-white/10 backdrop-blur-lg border placeholder-gray-400  border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-        placeholder="Enter Class(Class/Level e.g. class 10)"
-        onChange={(e) => setClassLevel(e.target.value)}
-        value={classLevel}
-      />
-      <input
-        type="text"
-        className="w-full p-3 rounded-xl bg-white/10 backdrop-blur-lg border placeholder-gray-400  border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-        placeholder="Exam Type(e.g. CBSE, JEE, NEET)"
-        onChange={(e) => setExamType(e.target.value)}
-        value={examType}
-      />
-      <div className="flex  gap-7 flex-wrap max-sm:flex-col">
-        <Toggle
-          lable="Exam Revision Mode"
-          chacked={revisionMode}
-          onChange={(e) => setRevisionMode(!revisionMode)}
-        />
-        <Toggle
-          lable="Include Diagram"
-          chacked={includeDiagram}
-          onChange={(e) => setIncludeDiagram(!includeDiagram)}
-        />
-        <Toggle
-          lable="Include Chart"
-          chacked={includeChart}
-          onChange={(e) => setIncudeChart(!includeChart)}
-        />
+      {/* Header Inside Card */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 dark:border-gray-800">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold font-heading text-gray-900 dark:text-white flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-lg">
+              <FaMagic />
+            </span>
+            Create Smart Exam Notes
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Tailored notes, flowcharts, data graphs, and exam Q&A generated by Google Gemini AI
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold shrink-0">
+          <FaGem className="text-[11px]" />
+          <span>Costs 10 Credits</span>
+        </div>
       </div>
 
-      <motion.button
-        onClick={handleSubmit}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-        className={`w-full mt-4 py-3 rounded-xl  font-semibold flex items-center justify-center gap-3 transition ${
-          loading
-            ? "bg-gray-300 text-gray-600 cursor-not-allowed "
-            : "bg-linear-to-br  from-white to-gray-200 text-black shadow(0_15px_35px_rgba(0,0,0,0.4))"
-        }`}
-      >
-        {loading ? "Generating Notes..." : "Generate Notes"}
-      </motion.button>
+      {/* Quick Example Suggestion Chips */}
+      <div className="pt-5 pb-2">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2.5 flex items-center gap-1.5">
+          <FaLightbulb className="text-yellow-500 text-xs" /> Try popular topics:
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {EXAMPLE_TOPICS.map((item, idx) => (
+            <button
+              key={idx}
+              type="button"
+              disabled={loading}
+              onClick={() => handleSelectExample(item)}
+              className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 hover:text-indigo-600 dark:hover:text-indigo-400 border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800 text-gray-700 dark:text-gray-300 font-medium transition-all"
+            >
+              {item.topic} <span className="text-gray-400 text-[10px]">({item.examType})</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
+      {/* Main Inputs Form */}
+      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        {/* Topic Input */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
+            Topic or Concept <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
+              <FaLightbulb className="text-sm" />
+            </div>
+            <input
+              type="text"
+              required
+              disabled={loading}
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-sm transition-all"
+              placeholder="e.g. Operating Systems Process Scheduling, Newton's Laws of Motion..."
+              onChange={(e) => setTopic(e.target.value)}
+              value={topic}
+            />
+          </div>
+        </div>
+
+        {/* 2-Column Grid: Class & Exam Type */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
+              Grade / Study Level
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
+                <FaGraduationCap className="text-sm" />
+              </div>
+              <input
+                type="text"
+                disabled={loading}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-sm transition-all"
+                placeholder="e.g. Class 10, Class 12, B.Tech 2nd Year"
+                onChange={(e) => setClassLevel(e.target.value)}
+                value={classLevel}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
+              Target Exam / Board
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
+                <FaAward className="text-sm" />
+              </div>
+              <input
+                type="text"
+                disabled={loading}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-sm transition-all"
+                placeholder="e.g. CBSE, ICSE, JEE Mains, NEET, University"
+                onChange={(e) => setExamType(e.target.value)}
+                value={examType}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Feature Toggles */}
+        <div className="pt-2">
+          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2.5">
+            Note Customizations
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <ToggleCard
+              icon={<FaBolt />}
+              title="Quick Revision"
+              description="High-yield cheat sheet summary"
+              checked={revisionMode}
+              onChange={() => setRevisionMode(!revisionMode)}
+              disabled={loading}
+            />
+            <ToggleCard
+              icon={<FaProjectDiagram />}
+              title="Mermaid Diagram"
+              description="Interactive concept flowchart"
+              checked={includeDiagram}
+              onChange={() => setIncludeDiagram(!includeDiagram)}
+              disabled={loading}
+            />
+            <ToggleCard
+              icon={<FaChartPie />}
+              title="Visual Data Chart"
+              description="Recharts graphs & breakdowns"
+              checked={includeChart}
+              onChange={() => setIncludeChart(!includeChart)}
+              disabled={loading}
+            />
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <motion.button
+          type="submit"
+          disabled={loading}
+          whileHover={loading ? {} : { scale: 1.01 }}
+          whileTap={loading ? {} : { scale: 0.99 }}
+          className={`w-full mt-4 py-3.5 px-6 rounded-xl font-semibold flex items-center justify-center gap-2.5 text-base transition-all shadow-md ${
+            loading
+              ? "bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed shadow-none"
+              : "bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-800 text-white shadow-indigo-500/25 cursor-pointer"
+          }`}
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Generating Notes with Gemini AI...</span>
+            </>
+          ) : (
+            <>
+              <FaMagic className="text-sm" />
+              <span>Generate Notes (10 Credits)</span>
+            </>
+          )}
+        </motion.button>
+      </form>
+
+      {/* Dynamic Animated Progress Bar */}
       {loading && (
-        <div className="mt-4 space-y-2">
-          <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-6 p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-2.5"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold">
+            <span className="text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+              </span>
+              {progressText}
+            </span>
+            <span className="text-indigo-600 dark:text-indigo-400">{progress}%</span>
+          </div>
+
+          <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ ease: "easeOut", duration: 0.6 }}
-              className="h-full bg-linear-to-r from-green-400 via-emerald-400 to-green-500"
-            ></motion.div>
+              transition={{ ease: "easeOut", duration: 0.3 }}
+              className="h-full bg-linear-to-r from-indigo-500 via-purple-500 to-emerald-500"
+            />
           </div>
-          <div className="flex justify-between text-xs text-gray-300">
-            <span>{progressText}</span>
-            <span>{progress}%</span>
-          </div>
-          <p className="text-xs text-gray-400 text-center">
-            this may take upto 2-5 minutes. Please don't close or refresh the
-            page.
+
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 text-center">
+            ⚡ Powered by Google Gemini AI · Usually completes in 3–5 seconds
           </p>
-        </div>
+        </motion.div>
       )}
     </motion.div>
   );
 }
-function Toggle({ lable, chacked, onChange }) {
+
+function ToggleCard({ icon, title, description, checked, onChange, disabled }) {
   return (
     <div
-      className="flex items-center gap-4 cursor-pointer select-none"
-      onClick={onChange}
+      onClick={() => !disabled && onChange()}
+      className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none flex items-start gap-3 ${
+        checked
+          ? "bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-800"
+          : "bg-gray-50/70 dark:bg-gray-800/40 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
+      } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
     >
-      <motion.div
-        animate={{
-          backgroundColor: chacked
-            ? "rgba(34,197,94,0.35)"
-            : "rgba(255,255,255,0.15)",
-        }}
-        transition={{ duration: 0.25 }}
-        className="relative w-14 h-7 rounded-full border border-white/20 backdrop-blur-lg"
-      >
-        <motion.div
-          layout
-          transition={{ type: "spring", damping: 25, stiffness: 400 }}
-          className="absolute top-1/2 w-6 h-6 bg-white rounded-full -translate-y-1/2"
-          style={{ left: chacked ? "1.75rem" : "0.05rem" }}
-        />
-      </motion.div>
-
-      <span
-        className={`text-sm transition-colors ${
-          chacked ? "text-green-300" : "text-gray-300"
-        }`}
-      >
-        {lable}
-      </span>
+      <div className={`mt-0.5 text-base ${checked ? "text-indigo-600 dark:text-indigo-400" : "text-gray-400"}`}>
+        {icon}
+      </div>
+      <div className="grow">
+        <div className="flex items-center justify-between">
+          <p className={`text-xs font-bold ${checked ? "text-indigo-900 dark:text-indigo-200" : "text-gray-700 dark:text-gray-300"}`}>
+            {title}
+          </p>
+          <div
+            className={`w-7 h-4 flex items-center rounded-full p-0.5 transition-colors ${
+              checked ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-700"
+            }`}
+          >
+            <div
+              className={`bg-white w-3 h-3 rounded-full shadow-xs transform transition-transform ${
+                checked ? "translate-x-3" : "translate-x-0"
+              }`}
+            />
+          </div>
+        </div>
+        <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+          {description}
+        </p>
+      </div>
     </div>
   );
 }
 
 export default TopicName;
+
